@@ -34,7 +34,7 @@ public class AStar
 			
 			for(int j=0;j<moves.length;j++)
 				if(neighbours.containsKey(moves[j]))
-					graph[i].adj.add(new E(graph[neighbours.get(moves[j])],moves[j],1));	
+					graph[i].adjacent.add(new E(graph[neighbours.get(moves[j])],moves[j],1));
 		}
 	}
 	
@@ -46,7 +46,7 @@ public class AStar
         PriorityQueue<N> open = new PriorityQueue<N>();
         ArrayList<N> closed = new ArrayList<N>();
 
-        start.g = 0;
+        start.pathCost = 0;
         start.h = game.getShortestPathDistance(start.index, target.index);
 
         start.reached=lastMoveMade;
@@ -61,7 +61,7 @@ public class AStar
             if (currentNode.isEqual(target))
                 break;
 
-            for(E next : currentNode.adj)
+            for(E next : currentNode.adjacent)
             {
             	if(next.move!=currentNode.reached.opposite())
             	{
@@ -69,7 +69,7 @@ public class AStar
 	
 	                if (!open.contains(next.node) && !closed.contains(next.node))
 	                {
-	                    next.node.g = currentDistance + currentNode.g;
+	                    next.node.pathCost = currentDistance + currentNode.pathCost;
 	                    next.node.h = game.getShortestPathDistance(next.node.index, target.index);
 	                    next.node.parent = currentNode;
 	                    
@@ -77,9 +77,9 @@ public class AStar
 	
 	                    open.add(next.node);
 	                }
-	                else if (currentDistance + currentNode.g < next.node.g)
+	                else if (currentDistance + currentNode.pathCost < next.node.pathCost)
 	                {
-	                    next.node.g = currentDistance + currentNode.g;
+	                    next.node.pathCost = currentDistance + currentNode.pathCost;
 	                    next.node.parent = currentNode;
 	                    
 	                    next.node.reached=next.move;
@@ -130,7 +130,7 @@ public class AStar
     {
     	for(N node : graph)
     	{
-    		node.g=0;
+    		node.pathCost =0;
     		node.h=0;
     		node.parent=null;
     		node.reached=null;
@@ -141,21 +141,21 @@ public class AStar
 class N implements Comparable<N>
 {
     public N parent;
-    public double g, h;
+    public double pathCost, h;
     public boolean visited = false;
-    public ArrayList<E> adj;
+    public ArrayList<E> adjacent;
     public int index;
     public MOVE reached=null;
 
     public N(int index)
     {
-        adj = new ArrayList<E>();
+        adjacent = new ArrayList<E>();
         this.index=index;
     }
 
-    public N(double g, double h)
+    public N(double pathCost, double h)
     {
-        this.g = g;
+        this.pathCost = pathCost;
         this.h = h;
     }
 
@@ -171,9 +171,9 @@ class N implements Comparable<N>
 
 	public int compareTo(N another)
 	{
-      if ((g + h) < (another.g + another.h))
+      if ((pathCost + h) < (another.pathCost + another.h))
     	  return -1;
-      else  if ((g + h) > (another.g + another.h))
+      else  if ((pathCost + h) > (another.pathCost + another.h))
     	  return 1;
 		
 		return 0;
